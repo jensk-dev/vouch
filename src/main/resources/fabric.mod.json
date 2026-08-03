@@ -1,0 +1,24 @@
+{
+	"schemaVersion": 1,
+	"id": "vouch",
+	"version": "${version}",
+	"name": "Vouch",
+	"description": "Adds permission based invite and vouch privileges to let the community manage the whitelist of your server.",
+	"authors": [
+		"Jens K."
+	],
+	"license": "MIT",
+	"environment": "server",
+	"entrypoints": {
+		"server": [
+			"dev.jensk.vouch.VouchMod"
+		]
+	},
+	"depends": {
+		"fabricloader": ">=0.19.3",
+		"minecraft": "~26.2",
+		"java": ">=25",
+		"fabric-api": "*",
+		"fabric-permissions-api-v0": "*"
+	}
+}

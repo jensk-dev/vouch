@@ -1,0 +1,15 @@
+{
+	"schemaVersion": 1,
+	"id": "vouch-test",
+	"version": "1.0.0",
+	"name": "Vouch GameTests",
+	"environment": "server",
+	"depends": {
+		"vouch": "*"
+	},
+	"entrypoints": {
+		"fabric-gametest": [
+			"dev.jensk.vouch.gametest.VouchGameTest"
+		]
+	}
+}

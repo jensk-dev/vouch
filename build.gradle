@@ -1,0 +1,79 @@
+plugins {
+	alias(libs.plugins.fabric.loom)
+}
+
+version = "${project.mod_version}+mc${libs.versions.minecraft.get()}"
+group = project.maven_group
+
+repositories {
+	// Loom adds the Fabric and Minecraft repositories automatically at build time, but
+	// Dependabot only sees repositories written in build files — the FabricMC maven is
+	// declared here so it can query fabric-loader/fabric-api/loom for updates.
+	// fabric-permissions-api and sqlite-jdbc come from Maven Central.
+	mavenCentral()
+	maven {
+		name = 'FabricMC'
+		url = 'https://maven.fabricmc.net/'
+	}
+}
+
+dependencies {
+	// No 'mappings' line: Minecraft 26.x ships unobfuscated, so Loom does not remap.
+	minecraft libs.minecraft
+	implementation libs.fabric.loader
+	implementation libs.fabric.api
+
+	// LuckPerms integration via fabric-permissions-api. Plain `implementation` (NOT
+	// modImplementation) since 26.1, and `include` bundles it jar-in-jar so the
+	// server only needs LuckPerms + Fabric API installed alongside this mod.
+	implementation libs.fabric.permissions.api
+	include libs.fabric.permissions.api
+
+	// SQLite (org.xerial:sqlite-jdbc) for the pending-vouch and audit-log storage, bundled
+	// jar-in-jar like the permissions API (~12 MB; ships natives for Linux x86_64/aarch64/musl,
+	// Windows, and macOS Intel/ARM). Its only transitive dep, slf4j-api, is already on Minecraft's
+	// classpath, so it is not bundled.
+	implementation libs.sqlite.jdbc
+	include libs.sqlite.jdbc
+
+	// Tests: JUnit 5 via Fabric Loader JUnit (runs JUnit under Fabric's classloader and brings
+	// JUnit Jupiter transitively). Minecraft + the main configurations are on the test classpath
+	// automatically for a single-source-set mod.
+	testImplementation libs.loader.junit
+}
+
+processResources {
+	def version = project.version
+	inputs.property "version", version
+
+	filesMatching("fabric.mod.json") {
+		expand "version": version
+	}
+}
+
+tasks.withType(JavaCompile).configureEach {
+	// Compile to Java 25 bytecode (Minecraft 26.x runtime) regardless of the JDK running Gradle.
+	it.options.release = 25
+}
+
+java {
+	withSourcesJar()
+
+	sourceCompatibility = JavaVersion.VERSION_25
+	targetCompatibility = JavaVersion.VERSION_25
+}
+
+test {
+	useJUnitPlatform()
+}
+
+// Server-side GameTests: creates the `src/gametest` source set and the `runGameTest` task.
+fabricApi {
+	configureTests {
+		createSourceSet = true
+		modId = "vouch-test"          // must differ from the main mod id "vouch"
+		enableGameTests = true
+		enableClientGameTests = false // server-only mod
+		eula = true
+	}
+}
