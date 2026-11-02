@@ -7,7 +7,7 @@ fabric-loader = "0.19.5"
 loader-junit = "0.19.5"
 fabric-api = "0.164.0+26.3"
 permissions-api = "0.7.0"
-sqlite-jdbc = "3.53.4.0"
+sqlite-jdbc = "3.54.1.0"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
